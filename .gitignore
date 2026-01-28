@@ -1,0 +1,5 @@
+/data-bin-amino-raw
+/checkpoints_amino
+/data-bin-amino-processed
+/__pycache__
+get-pip.py

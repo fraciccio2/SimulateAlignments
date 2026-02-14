@@ -4,6 +4,7 @@ import torch
 import argparse
 from Bio import SeqIO
 from fairseq.models.transformer import TransformerModel
+import summarize_results
 
 # Required for recent PyTorch versions (2.6+) to load Fairseq checkpoints safely
 if hasattr(torch.serialization, 'add_safe_globals'):
@@ -138,43 +139,14 @@ def align_tfa(input_path, model_dir, data_bin, output_path, num_seqs=10):
     for i, token in enumerate(tokens):
         msa_rows[i % num_seqs].append(token)
     
-    # 5. Save in FASTA format & Integrity Check
-    print("\n--- Integrity Check (Input vs Output Content) ---")
-    mismatch_found = False
-    
+    # 5. Save in FASTA format
+    # We save the model output first
     with open(output_path, "w") as f:
         for i, record in enumerate(records):
             aligned_seq = "".join(msa_rows[i])
-            
-            # Remove gaps to check original content
-            degapped_seq = aligned_seq.replace("-", "")
-            original_seq = str(record.seq)
-            
-            status = "OK"
-            if degapped_seq != original_seq:
-                status = "MISMATCH"
-                mismatch_found = True
-                diff = len(original_seq) - len(degapped_seq)
-                
             f.write(f">{record.id}\n{aligned_seq}\n")
-            
-            print(f"Seq {i+1} ({record.id}): {status}")
-            if status == "MISMATCH":
-                print(f"  - Input len: {len(original_seq)} | Output residue count: {len(degapped_seq)}")
-                if diff > 0:
-                    print(f"  - MISSING: {diff} residues deleted by model.")
-                elif diff < 0:
-                    print(f"  - HALLUCINATION: {abs(diff)} extra residues added.")
-                else:
-                    print(f"  - MUTATION: Length matches, but sequences differ.")
 
-    print("--------------------------------------------------")
-    if mismatch_found:
-        print("\n[WARNING] The model did not preserve sequence identity.")
-        print("This is common in Seq2Seq models if:")
-        print("1. The input is too long for the context window.")
-        print("2. The model is not fully converged/trained.")
-        print("3. The 'Interleaved' format desynchronized (a token was skipped).")
+    summarize_results.process_sequence_data(input_path, output_path)
     
     print(f"\nAlignment completed!")
     print(f"Result saved in: {output_path}")

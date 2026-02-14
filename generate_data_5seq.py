@@ -48,17 +48,17 @@ def prepare_data():
                 if isinstance(target_raw, str):
                     total_len = len(target_raw)
 
-                    # 1. Dobbiamo prima decodificare la struttura originale a 10
+                    # 1. We first need to decode the original 10-sequence structure
                     if total_len % ORIGINAL_NUM_SEQS == 0:
                         real_seq_len = total_len // ORIGINAL_NUM_SEQS
 
-                        # Recuperiamo tutte e 10 le righe originali
+                        # Recover all 10 original rows
                         all_10_rows = [target_raw[i*real_seq_len : (i+1)*real_seq_len] for i in range(ORIGINAL_NUM_SEQS)]
 
-                        # 2. SELEZIONE: Prendiamo solo le prime 5 righe
+                        # 2. SELECTION: Take only the first 5 rows
                         selected_rows = all_10_rows[:TARGET_NUM_SEQS]
 
-                        # 3. INTERLEAVING: Ora lavoriamo come se avessimo solo 5 sequenze
+                        # 3. INTERLEAVING: Process as if we only have 5 sequences
                         interleaved_tokens = []
                         for col_idx in range(real_seq_len):
                             for row_idx in range(TARGET_NUM_SEQS):

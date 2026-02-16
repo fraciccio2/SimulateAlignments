@@ -138,13 +138,6 @@ def align_tfa(input_path, model_dir, data_bin, output_path, num_seqs=10):
     msa_rows = [[] for _ in range(num_seqs)]
     for i, token in enumerate(tokens):
         msa_rows[i % num_seqs].append(token)
-    
-    # 5. Save in FASTA format
-    # We save the model output first
-    with open(output_path, "w") as f:
-        for i, record in enumerate(records):
-            aligned_seq = "".join(msa_rows[i])
-            f.write(f">{record.id}\n{aligned_seq}\n")
 
     summarize_results.process_sequence_data(input_path, output_path)
     

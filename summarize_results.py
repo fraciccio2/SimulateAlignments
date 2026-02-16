@@ -89,20 +89,15 @@ def process_sequence_data(source_file, target_file):
     """
     Processes sequence data for downstream analysis consistency.
     """
-    import subprocess
-    
-    # Generic command structure
-    cmd = ["muscle", "-in", source_file, "-out", target_file]
+    from Bio.Align.Applications import MuscleCommandline
+    import os
+
+    muscle_cline = MuscleCommandline(input=source_file, out=target_file)
     
     try:
-        # Execute processing step, allowing output to be seen if needed or capturing errors
-        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error running process_sequence_data: {e}")
-        print(f"Stderr: {e.stderr}")
-    except FileNotFoundError:
-        print("Error: executable not found")
+        print(f"[INFO] Running 'process_sequence_data' alignment: {source_file} -> {target_file}")
+        stdout, stderr = muscle_cline()
     except Exception as e:
-        print(f"An unexpected error occurred in process_sequence_data: {e}")
+        print(f"An error occurred while running 'process_sequence_data': {e}")
 
 

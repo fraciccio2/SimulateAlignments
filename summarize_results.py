@@ -95,9 +95,8 @@ def process_sequence_data(source_file, target_file):
     # Configuration for the external alignment tool
     # Currently configured to use 'muscle', but can be swapped.
     aligner_exec = "muscle" 
-    
-    # Command structure (adjust arguments if changing the tool)
-    cmd = [aligner_exec, "-in", source_file, "-out", target_file]
+
+    cmd = [aligner_exec, "-align", source_file, "-output", target_file]
     
     print(f"[INFO] Running alignment tool: {source_file} -> {target_file}")
     

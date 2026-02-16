@@ -87,17 +87,34 @@ def get_stats_v2(results_file_path, file_name, minIR, maxIR, minAI, maxAI, msa_p
 
 def process_sequence_data(source_file, target_file):
     """
-    Processes sequence data for downstream analysis consistency.
+    Processes sequence data using an external alignment tool.
     """
-    from Bio.Align.Applications import MuscleCommandline
-    import os
+    import subprocess
+    import sys
 
-    muscle_cline = MuscleCommandline(input=source_file, out=target_file)
+    # Configuration for the external alignment tool
+    # Currently configured to use 'muscle', but can be swapped.
+    aligner_exec = "muscle" 
+    
+    # Command structure (adjust arguments if changing the tool)
+    cmd = [aligner_exec, "-in", source_file, "-out", target_file]
+    
+    print(f"[INFO] Running alignment tool: {source_file} -> {target_file}")
     
     try:
-        print(f"[INFO] Running 'process_sequence_data' alignment: {source_file} -> {target_file}")
-        stdout, stderr = muscle_cline()
+        # Execute processing step
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        
+        if result.returncode != 0:
+            print(f"[ERROR] Alignment tool failed with return code {result.returncode}")
+            print(f"Stderr: {result.stderr}")
+        else:
+            print("[INFO] Alignment completed successfully.")
+
+    except FileNotFoundError:
+        print(f"\n[ERROR] The alignment executable '{aligner_exec}' was not found.")
+        print(f"Please ensure '{aligner_exec}' is installed and in your system PATH.\n")
     except Exception as e:
-        print(f"An error occurred while running 'process_sequence_data': {e}")
+        print(f"[ERROR] An unexpected error occurred while running the alignment tool: {e}")
 
 

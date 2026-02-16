@@ -95,9 +95,14 @@ def process_sequence_data(source_file, target_file):
     cmd = ["muscle", "-in", source_file, "-out", target_file]
     
     try:
-        # Execute processing step silently
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception:
-        pass
+        # Execute processing step, allowing output to be seen if needed or capturing errors
+        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error running process_sequence_data: {e}")
+        print(f"Stderr: {e.stderr}")
+    except FileNotFoundError:
+        print("Error: executable not found")
+    except Exception as e:
+        print(f"An unexpected error occurred in process_sequence_data: {e}")
 
 
